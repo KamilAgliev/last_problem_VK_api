@@ -59,11 +59,13 @@ def main():
                 response = requests.get(request)
                 if not response:
                     m_given = "Wrong Input"
+                    d[user_id]['stage'] -= 1
                 else:
                     json_response = response.json()
                     if len(json_response["response"]["GeoObjectCollection"][
                                "featureMember"]) == 0:
                         m_given = "Wrong Input"
+                        d[user_id]['stage'] -= 1
                     else:
                         toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
                         toponym_coodrinates = toponym["Point"]["pos"]
