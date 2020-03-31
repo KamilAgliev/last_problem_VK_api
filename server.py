@@ -6,6 +6,8 @@ import vk_api
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 import random
 
+from vk_api.keyboard import VkKeyboard, VkKeyboardColor
+
 from data import LOGIN, PASSWORD, GROUP_TOKEN, GROUP_ID, ALBUM_ID
 
 d = {}
@@ -52,7 +54,7 @@ def main():
             vk = vk_session.get_api()
             if d[user_id]['stage'] == 0:
                 vk.messages.send(user_id=user_id, message="Здравствуйте, укажите местность которую хотите увидеть.",
-                                random_id = random.randint(0, 2 ** 64))
+                                 random_id=random.randint(0, 2 ** 64))
             elif d[user_id]['stage'] == 1:
                 request = f"http://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b&geocode" \
                     f"={m_took}&format=json"
@@ -73,8 +75,15 @@ def main():
                         d[user_id]['request'] = m_took
                         d[user_id]['longitude'] = longitude
                         d[user_id]['latitude'] = latitude
-                        m_given = "Выберите тип карты: \n 1.схема \n 2.спутник \n 3.гибрид"
+
+                        keyboard = VkKeyboard(one_time=True)
+                        keyboard.add_button('схема', color=VkKeyboardColor.POSITIVE)
+                        keyboard.add_button('спутник', color=VkKeyboardColor.POSITIVE)
+                        keyboard.add_button('гибрид', color=VkKeyboardColor.POSITIVE)
+
+                        m_given = "Выберите тип карты"
                 vk.messages.send(user_id=event.obj.message['from_id'], message=m_given,
+                                 keyboard=keyboard.get_keyboard(),
                                  random_id=random.randint(0, 2 ** 64))
             elif d[user_id]['stage'] == 2:
                 if m_took not in maps.keys():
